@@ -133,7 +133,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t* record){
 				pseudo_gui = false;
 			}
 			break;
-	
+	}
 	if (pseudo_gui && record-> event.pressed){
 		switch (keycode){
 			case DE_L:
@@ -149,10 +149,10 @@ bool process_record_user(uint16_t keycode, keyrecord_t* record){
 		}
 	}
 			
-	switch (keycode)
+	switch (keycode){
 		case LT(_MOUSE,KC_BSPC):
 		case LT(_NUM,KC_BSPC):
-			if(record->event.pressed && record->tap.count){
+			if(record->event.pressed && record->tap.count >0){
 				uint8_t mods = get_mods();
 				uint8_t weak_mods = get_weak_mods();
 				uint8_t osm = get_oneshot_mods();
@@ -160,22 +160,19 @@ bool process_record_user(uint16_t keycode, keyrecord_t* record){
 					del_mods(MOD_MASK_SHIFT);
 					del_weak_mods(MOD_MASK_SHIFT);
 					del_oneshot_mods(MOD_MASK_SHIFT);
-					tap_code(KC_DEL);
-					if (mods & MOD_MASK_SHIFT){
-						add_mods(MOD_MASK_SHIFT);
-					}
-					if (weak_mods & MOD_MASK_SHIFT){
-						add_weak_mods(MOD_MASK_SHIFT);
-					}
-					if (osm & MOD_MASK_SHIFT){
-						add_oneshot_mods(MOD_MASK_SHIFT);
-					}
+					
+					register_code16(KC_DEL);
+					unregister_code16(KC_DEL);
+					
+					set_mods(mods);
+					set_weak_mods(weak_mods);
+					set_oneshot_mods(osm);
 					return false;
 				}
 			}
 			break;
 				
-	  }
+	}
 	return true;  // Continue default handling.
 }
 
