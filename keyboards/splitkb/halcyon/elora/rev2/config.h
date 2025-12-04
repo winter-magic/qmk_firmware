@@ -3,6 +3,38 @@
 
 #pragma once
 
+//Markus Features
+#define BOTH_SHIFTS_TURNS_ON_CAPS_WORD
+
+#define RGB_MATRIX_DEFAULT_ON true
+
+#ifdef TAPPING_TERM
+# undef TAPPING_TERM
+# define TAPPING_TERM 250
+#endif
+#define PERMISSIVE_HOLD
+#define CHORDAL_HOLD
+#define FLOW_TAP_TERM 150
+
+//#define SPLIT_USB_DETECT
+//#define SPLIT_USB_TIMEOUT 20000
+//#define SPLIT_USB_TIMEOUT_POLL 1
+//#define SPLIT_MAX_CONNECTION_ERRORS 50
+
+#define LEADER_TIMEOUT 400
+#define LEADER_PER_KEY_TIMING
+#define LEADER_NO_TIMEOUT
+
+#define TAPPING_TERM 300
+#define TAPPING_TERM_PER_KEY
+
+#define LUMBERJACK_COLOR
+#define ACTION_DEBUG
+
+//Ende Markus Features
+
+
+
 // Make it easier to enter the bootloader
 #define RP2040_BOOTLOADER_DOUBLE_TAP_RESET
 #define RP2040_BOOTLOADER_DOUBLE_TAP_RESET_TIMEOUT 1000U
