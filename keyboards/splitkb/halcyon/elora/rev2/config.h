@@ -28,7 +28,6 @@
 #define TAPPING_TERM 300
 #define TAPPING_TERM_PER_KEY
 
-#define LUMBERJACK_COLOR
 #define ACTION_DEBUG
 
 //Ende Markus Features
