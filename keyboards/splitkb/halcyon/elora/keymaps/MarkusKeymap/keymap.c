@@ -113,43 +113,69 @@ tap_dance_action_t tap_dance_actions[] = {
     [TD_TAB_ESC] = ACTION_TAP_DANCE_DOUBLE(KC_TAB, KC_ESC),
 };
 
-static bool pseudo_gui = false;
+enum {
+    SOFT_GUI = SAFE_RANGE,
+};
 
-bool process_record_user(uint16_t keycode, keyrecord_t* record){
-	
+
+static bool soft_gui_active = false;
+static uint8_t soft_gui_L_count = 0;
+
+bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+
 	if (leader_sequence_active()) {
         return true;
     }
-	switch (keycode) {
-		case LGUI_T(DE_A):
-			if( record-> event.pressed){
-				if (record -> tap.count ==0){
-					// Hold -> aktiviere Pseudo GUI
-					pseudo_gui = true;
-					return false; // NICHT automatisch echte GUI senden
-				}
-			}
-			else {
-				pseudo_gui = false;
-			}
-			break;
-	}
-	if (pseudo_gui && record-> event.pressed){
-		switch (keycode){
-			case DE_L:
-				// Win + L blockieren nur L senden
-				tap_code(DE_L);
-				return false;
-			default: 
-				//Alle anderen Shotcuts -> echt ausführen
-				register_code(KC_LGUI);
-				tap_code(keycode);
-				unregister_code(KC_LGUI);
-				return false;
-		}
-	}
-			
-	switch (keycode){
+
+    // Soft-GUI wird durch den Mod-Tap aktiviert/deaktiviert
+    if (keycode == SOFT_GUI) {
+        if (record->event.pressed) {
+            soft_gui_active = true;
+            soft_gui_L_count = 0;  // wichtig: L-Zähler zurücksetzen
+        } else {
+            soft_gui_active = false;
+        }
+        return false;
+    }
+
+    // Wenn Soft-GUI aktiv:
+    if (soft_gui_active) {
+
+        // -------------------------
+        // Sonderfall: Win+L blockieren
+        // -------------------------
+        if (keycode == KC_L && record->event.pressed) {
+
+            soft_gui_L_count++;
+
+            // Nur das *erste* L blockieren
+            if (soft_gui_L_count == 1) {
+                tap_code(KC_A);
+                tap_code(KC_L);
+                return false;
+            }
+
+            // Ab dem zweiten L → NICHT blockieren
+            // einfach „L“ normal ausgeben
+            // (keine GUI gedrückt)
+            return true;
+        }
+
+        // -------------------------
+        // Andere Soft-GUI-Kombinationen → echtes Win+Key
+        // -------------------------
+        if (record->event.pressed) {
+            register_code(KC_LGUI);
+            register_code(keycode);
+        } else {
+            unregister_code(keycode);
+            unregister_code(KC_LGUI);
+        }
+
+        return false;
+    }
+
+   switch (keycode){
 		case LT(_MOUSE,KC_BSPC):
 		case LT(_NUM,KC_BSPC):
 			if(record->event.pressed && record->tap.count >0){
@@ -175,6 +201,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t* record){
 	}
 	return true;  // Continue default handling.
 }
+
 
 bool leader_add_user(uint16_t keycode) {
     return my_leader_add_user(keycode);
@@ -202,11 +229,11 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 //  */
 
     [_BASE] = LAYOUT(
-     KC_ESC ,KC_1        , KC_2       ,KC_3        , KC_4             ,  KC_5           ,                                                      KC_6             ,   KC_7     ,KC_8        ,  KC_9      ,KC_0         , DE_SS ,
-     KC_TAB ,DE_Q        ,DE_W        ,DE_E        , DE_R             ,  DE_T           ,                                                      DE_Z             ,   DE_U     ,DE_I        ,DE_O        ,DE_P         , DE_UE ,
-     DB_TOGG,LGUI_T(DE_A),LALT_T(DE_S),LSFT_T(DE_D),LCTL_T(DE_F)      ,  DE_G           ,                                                      DE_H             ,RCTL_T(DE_J),RSFT_T(DE_K),LALT_T(DE_L),RGUI_T(DE_OE), DE_AE ,
-     KC_LSFT,DE_Y        , DE_X       ,DE_C        , DE_V             ,  DE_B           , KC_DEL, DE_DRUCK      ,KC_INSERT, CW_TOGG         ,DE_N             ,DE_M        ,DE_COMM     ,DE_DOT      ,DE_MINS      ,KC_RSFT,
-                                       RM_TOGG     ,LT(_MOUSE,KC_BSPC),LT(_NAV,KC_ENTER),QK_LEAD,TD(TD_TAB_ESC) , QK_REP  ,LT(_NUM, KC_BSPC),LT(_SYM,KC_SPACE),MO(_FUN)    ,RM_TOGG
+     KC_ESC ,KC_1             , KC_2       ,KC_3        , KC_4             ,  KC_5           ,                                                      KC_6             ,   KC_7     ,KC_8        ,  KC_9      ,KC_0         , DE_SS ,
+     KC_TAB ,DE_Q             ,DE_W        ,DE_E        , DE_R             ,  DE_T           ,                                                      DE_Z             ,   DE_U     ,DE_I        ,DE_O        ,DE_P         , DE_UE ,
+     DB_TOGG,MT(SOFT_GUI,DE_A),LALT_T(DE_S),LSFT_T(DE_D),LCTL_T(DE_F)      ,  DE_G           ,                                                      DE_H             ,RCTL_T(DE_J),RSFT_T(DE_K),LALT_T(DE_L),RGUI_T(DE_OE), DE_AE ,
+     KC_LSFT,DE_Y             , DE_X       ,DE_C        , DE_V             ,  DE_B           , KC_DEL, DE_DRUCK      ,KC_INSERT, CW_TOGG         ,DE_N             ,DE_M        ,DE_COMM     ,DE_DOT      ,DE_MINS      ,KC_RSFT,
+                                            RM_TOGG     ,LT(_MOUSE,KC_BSPC),LT(_NAV,KC_ENTER),QK_LEAD,TD(TD_TAB_ESC) , QK_REP  ,LT(_NUM, KC_BSPC),LT(_SYM,KC_SPACE),MO(_FUN)    ,RM_TOGG
     ),
 
     [_NAV] = LAYOUT(

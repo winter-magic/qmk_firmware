@@ -181,7 +181,13 @@ bool my_leader_add_user(uint16_t keycode) {
         // Stop
         SEND_STRING(SS_LCTL(SS_TAP(X_F2)));
 		return true;
-    }
+    } else if (leader_sequence_two_keys(KC_R, KC_A)){
+		// Run Anything (Double Strg)
+        SEND_STRING(SS_TAP(X_LCTL));
+		wait_ms(25);
+		SEND_STRING(SS_TAP(X_LCTL));
+		return true;
+	}
 	
 	 // Display Options (D)
     else if (leader_sequence_two_keys(KC_D, KC_D)) {
