@@ -11,6 +11,8 @@
 #define PERMISSIVE_HOLD
 #define CHORDAL_HOLD
 #define FLOW_TAP_TERM 150
+#define SPECULATIVE_HOLD
+
 
 #define LEADER_TIMEOUT 400
 #define LEADER_PER_KEY_TIMING
@@ -20,8 +22,6 @@
 #define TAPPING_TERM_PER_KEY
 
 #define QUICK_TAP_TERM 0
-
-#define ACTION_DEBUG
 
 //Ende Markus Features
 
