@@ -60,6 +60,10 @@ enum layers {
 
 #define LAYERLOCK QK_LAYER_LOCK
 
+
+#define ALT_L LALT_T(DE_L)
+#define NAV_ENTER LT(_NAV, KC_ENTER)
+
 bool caps_word_press_user(uint16_t keycode) {
     switch (keycode) {
         // Keycodes that continue Caps Word, with shift applied.
@@ -91,6 +95,24 @@ combo_t key_combos[] = {
     COMBO(paste, LCTL(DE_V)),	
 };
 
+bool get_hold_on_other_key_press(uint16_t keycode, keyrecord_t *record) {
+    switch (keycode) {
+
+        case LT(_SYM,KC_SPACE):
+            return true;   // ← HIER aktivieren
+		case LT(_NUM, KC_BSPC):
+            return true;   // ← HIER aktivieren
+		case LT(_NAV,KC_ENTER):
+            return true;   // ← HIER aktivieren
+		case LT(_MOUSE,KC_BSPC):
+            return true;   // ← HIER aktivieren
+
+        default:
+            return false;  // ← überall sonst aus
+    }
+}
+
+
 const char chordal_hold_layout[MATRIX_ROWS][MATRIX_COLS] PROGMEM =
     LAYOUT(
         'L', 'L', 'L', 'L', 'L', 'L',                     'R', 'R', 'R', 'R', 'R', 'R', 
@@ -120,6 +142,8 @@ enum {
 
 static bool soft_gui_active = false;
 static uint8_t soft_gui_L_count = 0;
+
+static bool alt_l_held = false;
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 
@@ -188,15 +212,33 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 					del_oneshot_mods(MOD_MASK_SHIFT);
 					
 					register_code16(KC_DEL);
-					unregister_code16(KC_DEL);
+                    unregister_code16(KC_DEL);
 					
 					set_mods(mods);
 					set_weak_mods(weak_mods);
 					set_oneshot_mods(osm);
-					return false;
+					return false;	
 				}
 			}
 			break;
+		case ALT_L:
+            if (record->event.pressed) {
+                alt_l_held = true;
+            } else {
+                alt_l_held = false;
+            }
+            break;
+
+        case NAV_ENTER:
+            if (record->event.pressed && alt_l_held) {
+                // Alt+Enter ausführen
+                register_mods(MOD_LALT);
+                tap_code(KC_ENTER);
+                unregister_mods(MOD_LALT);
+
+                return false; // normales Enter verhindern
+            }
+            break;
 				
 	}
 	return true;  // Continue default handling.
@@ -211,29 +253,12 @@ bool leader_add_user(uint16_t keycode) {
 // clang-format off
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
-// /*
-//  * BASE
-//  *4
-//  * ,-------------------------------------------.                              ,-------------------------------------------.
-//  * |        |      |      |      |      |      |                              |      |      |      |      |      |        |
-//  * |--------+------+------+------+------+------|                              |------+------+------+------+------+--------|
-//  * |        |      |      |      |      |      |                              |      |      |      |      |      |        |
-//  * |--------+------+------+------+------+------|                              |------+------+------+------+------+--------|
-//  * |        |      |      |      |      |      |                              |      |      |      |      |      |        |
-//  * |--------+------+------+------+------+------+-------------.  ,-------------+------+------+------+------+------+--------|
-//  * |        |      |      |      |      |      |      |      |  |      |      |      |      |      |      |      |        |
-//  * `----------------------+------+------+------+------+------|  |------+------+------+------+------+----------------------'
-//  *                        |      |      |      |      |      |  |      |      |      |      |      |
-//  *                        |      |      |      |      |      |  |      |      |      |      |      |
-//  *                        `----------------------------------'  `----------------------------------'
-//  */
-
     [_BASE] = LAYOUT(
-     KC_ESC ,KC_1             , KC_2       ,KC_3        , KC_4             ,  KC_5           ,                                                      KC_6             ,   KC_7     ,KC_8        ,  KC_9      ,KC_0         , DE_SS ,
-     KC_TAB ,DE_Q             ,DE_W        ,DE_E        , DE_R             ,  DE_T           ,                                                      DE_Z             ,   DE_U     ,DE_I        ,DE_O        ,DE_P         , DE_UE ,
-     DB_TOGG,MT(SOFT_GUI,DE_A),LALT_T(DE_S),LSFT_T(DE_D),LCTL_T(DE_F)      ,  DE_G           ,                                                      DE_H             ,RCTL_T(DE_J),RSFT_T(DE_K),LALT_T(DE_L),RGUI_T(DE_OE), DE_AE ,
-     KC_LSFT,DE_Y             , DE_X       ,DE_C        , DE_V             ,  DE_B           , KC_DEL, DE_DRUCK      ,KC_INSERT, CW_TOGG         ,DE_N             ,DE_M        ,DE_COMM     ,DE_DOT      ,DE_MINS      ,KC_RSFT,
-                                            RM_TOGG     ,LT(_MOUSE,KC_BSPC),LT(_NAV,KC_ENTER),QK_LEAD,TD(TD_TAB_ESC) , QK_REP  ,LT(_NUM, KC_BSPC),LT(_SYM,KC_SPACE),MO(_FUN)    ,RM_TOGG
+     KC_ESC ,KC_1             , KC_2       ,KC_3        , KC_4             ,  KC_5   ,                                                    KC_6             ,   KC_7     ,KC_8        ,  KC_9,KC_0         , DE_SS ,
+     KC_TAB ,DE_Q             ,DE_W        ,DE_E        , DE_R             ,  DE_T   ,                                                    DE_Z             ,   DE_U     ,DE_I        ,DE_O  ,DE_P         , DE_UE ,
+     DB_TOGG,MT(SOFT_GUI,DE_A),LALT_T(DE_S),LSFT_T(DE_D),LCTL_T(DE_F)      ,  DE_G   ,                                                    DE_H             ,RCTL_T(DE_J),RSFT_T(DE_K),ALT_L ,RGUI_T(DE_OE), DE_AE ,
+     KC_LSFT,DE_Y             , DE_X       ,DE_C        , DE_V             ,  DE_B   , KC_DEL, DE_DRUCK      ,KC_INSERT, CW_TOGG         ,DE_N             ,DE_M        ,DE_COMM     ,DE_DOT,DE_MINS      ,KC_RSFT,
+                                            RM_TOGG     ,LT(_MOUSE,KC_BSPC),NAV_ENTER,QK_LEAD,TD(TD_TAB_ESC) , QK_REP  ,LT(_NUM, KC_BSPC),LT(_SYM,KC_SPACE),MO(_FUN)    ,RM_TOGG
     ),
 
     [_NAV] = LAYOUT(
