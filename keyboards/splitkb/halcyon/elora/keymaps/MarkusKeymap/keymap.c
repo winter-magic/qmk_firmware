@@ -95,6 +95,7 @@ combo_t key_combos[] = {
     COMBO(paste, LCTL(DE_V)),	
 };
 
+
 bool get_hold_on_other_key_press(uint16_t keycode, keyrecord_t *record) {
     switch (keycode) {
 
@@ -112,6 +113,18 @@ bool get_hold_on_other_key_press(uint16_t keycode, keyrecord_t *record) {
     }
 }
 
+uint16_t get_flow_tap_term(uint16_t keycode, keyrecord_t *record, uint16_t prev_keycode) {
+    switch (keycode) {
+        case LT(_SYM, KC_SPACE):
+        case LT(_NUM, KC_BSPC):
+        case LT(_NAV, KC_ENTER):
+        case LT(_MOUSE, KC_BSPC):
+            return 0;  // Flow Tap deaktiviert → Hold möglich
+        default:
+            return FLOW_TAP_TERM;  // Für Homerow-Mods normal aktiv
+    }
+}
+
 
 const char chordal_hold_layout[MATRIX_ROWS][MATRIX_COLS] PROGMEM =
     LAYOUT(
@@ -122,11 +135,7 @@ const char chordal_hold_layout[MATRIX_ROWS][MATRIX_COLS] PROGMEM =
                        '*', '*', '*', '*', '*', '*', '*', '*', '*', '*'
     );
 	
-
-/*void keyboard_post_init_user(void){
-	wait_ms(500);
-}*/
-
+/*
 enum {
     TD_TAB_ESC,
 };
@@ -134,10 +143,11 @@ enum {
 tap_dance_action_t tap_dance_actions[] = {
     [TD_TAB_ESC] = ACTION_TAP_DANCE_DOUBLE(KC_TAB, KC_ESC),
 };
-
+*/
 enum {
     SOFT_GUI = SAFE_RANGE,
 };
+
 
 
 static bool soft_gui_active = false;
@@ -254,11 +264,11 @@ bool leader_add_user(uint16_t keycode) {
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
     [_BASE] = LAYOUT(
-     KC_ESC ,KC_1             , KC_2       ,KC_3        , KC_4             ,  KC_5   ,                                                    KC_6             ,   KC_7     ,KC_8        ,  KC_9,KC_0         , DE_SS ,
-     KC_TAB ,DE_Q             ,DE_W        ,DE_E        , DE_R             ,  DE_T   ,                                                    DE_Z             ,   DE_U     ,DE_I        ,DE_O  ,DE_P         , DE_UE ,
-     DB_TOGG,MT(SOFT_GUI,DE_A),LALT_T(DE_S),LSFT_T(DE_D),LCTL_T(DE_F)      ,  DE_G   ,                                                    DE_H             ,RCTL_T(DE_J),RSFT_T(DE_K),ALT_L ,RGUI_T(DE_OE), DE_AE ,
-     KC_LSFT,DE_Y             , DE_X       ,DE_C        , DE_V             ,  DE_B   , KC_DEL, DE_DRUCK      ,KC_INSERT, CW_TOGG         ,DE_N             ,DE_M        ,DE_COMM     ,DE_DOT,DE_MINS      ,KC_RSFT,
-                                            RM_TOGG     ,LT(_MOUSE,KC_BSPC),NAV_ENTER,QK_LEAD,TD(TD_TAB_ESC) , QK_REP  ,LT(_NUM, KC_BSPC),LT(_SYM,KC_SPACE),MO(_FUN)    ,RM_TOGG
+     KC_ESC ,KC_1             , KC_2       ,KC_3        , KC_4             ,  KC_5   ,                                             KC_6             ,   KC_7     ,KC_8        ,  KC_9,KC_0         , DE_SS ,
+     KC_TAB ,DE_Q             ,DE_W        ,DE_E        , DE_R             ,  DE_T   ,                                             DE_Z             ,   DE_U     ,DE_I        ,DE_O  ,DE_P         , DE_UE ,
+     _______,MT(SOFT_GUI,DE_A),LALT_T(DE_S),LSFT_T(DE_D),LCTL_T(DE_F)      ,  DE_G   ,                                             DE_H             ,RCTL_T(DE_J),RSFT_T(DE_K),ALT_L ,RGUI_T(DE_OE), DE_AE ,
+     KC_LSFT,DE_Y             , DE_X       ,DE_C        , DE_V             ,  DE_B   , KC_DEL,DE_DRUCK,KC_INSERT, _______         ,DE_N             ,DE_M        ,DE_COMM     ,DE_DOT,DE_MINS      ,KC_RSFT,
+                                            RM_TOGG     ,LT(_MOUSE,KC_BSPC),NAV_ENTER,QK_LEAD,KC_TAB  , KC_ESC  ,LT(_NUM, KC_BSPC),LT(_SYM,KC_SPACE),MO(_FUN)    ,RM_TOGG
     ),
 
     [_NAV] = LAYOUT(
@@ -271,18 +281,18 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 	
 	[_MOUSE] = LAYOUT(
       _______, _______, _______, _______, _______, _______,                                       _______, MS_ACL0  , MS_ACL1  , MS_ACL2  , _______, _______,
-      _______, _______, _______, _______, _______, _______,                                       MS_WHLU, MS_BTN1  , MS_UP    , MS_BTN2  , _______, _______,
-      _______, KC_LGUI, KC_LALT, KC_LSFT, KC_LCTL, _______,                                       MS_WHLD, MS_LEFT  , MS_DOWN  , MS_RGHT  , MS_BTN3, _______,
-      _______, _______, _______, _______, _______, _______, _______,LAYERLOCK,LAYERLOCK, _______,_______ ,LCTL(DE_V),LCTL(DE_C),LCTL(DE_X), _______, _______,
+      _______, _______, _______, RM_NEXT, DT_UP  , _______,                                       MS_WHLU, MS_BTN1  , MS_UP    , MS_BTN2  , _______, _______,
+      _______, KC_LGUI, KC_LALT, KC_LSFT, KC_LCTL, DT_PRNT,                                       MS_WHLD, MS_LEFT  , MS_DOWN  , MS_RGHT  , MS_BTN3, _______,
+      _______, _______, _______, RM_PREV, DT_DOWN, _______, _______,LAYERLOCK,LAYERLOCK, _______,_______ ,LCTL(DE_V),LCTL(DE_C),LCTL(DE_X), _______, _______,
                                  _______, _______, _______, _______, _______ , _______ , _______, _______, _______  , _______
     ),
 	
-	[_SYM] = LAYOUT(
-      _______,_______    , _______  , _______    , _______    , _______  ,                                     _______      , _______    , _______    , _______  , _______     , _______,
-      _______,DE_SHKOMMA ,DE_KLEINER,DE_GROESSER ,DE_MINUS    ,DE_ODER   ,                                     DE_CIRCUMFLEX,DE_GKLAMMERL,DE_GKLAMMERR, DE_DOLLAR, DE_EURO     , _______,
-      _______,DE_AUSRUFEZ, DE_MAL   ,DE_FSLASH   ,DE_EQUAL    ,DE_UND    ,                                     DE_HASH      ,DE_RKLAMMERL,DE_RKLAMMERR, DE_BSLASH, DE_CIRCLE   , _______,
-      _______,DE_TILDE   , DE_PLUS  ,DE_EKLAMMERL,DE_EKLAMMERR,DE_PROZENT, _______, _______, _______, _______, DE_AT        , DE_DHKOMMA , DE_COMM    , DE_DOT   , DE_PARAGRAPH, _______,
-                                        _______  , _______    , _______  , _______, _______, _______, _______, _______      , _______    , _______
+	[_SYM] = LAYOUT(  
+      _______,_______    , _______  , _______    , _______     , _______  ,                                 _______      , _______    , _______    , _______  , _______       , _______,
+      _______,DE_SHKOMMA ,DE_KLEINER,DE_GROESSER ,DE_MINUS     ,DE_ODER   ,                                 DE_CIRCUMFLEX,DE_GKLAMMERL,DE_GKLAMMERR, DE_DOLLAR, DE_EURO       , _______,
+      _______,DE_AUSRUFEZ,DE_MAL    ,DE_FSLASH   ,DE_EQUAL     ,DE_UND    ,                                 DE_HASH      ,DE_RKLAMMERL,DE_RKLAMMERR,DE_BSLASH ,DE_CIRCLE      , _______,
+      _______,DE_TILDE   ,DE_PLUS   ,DE_EKLAMMERL,DE_EKLAMMERR ,DE_PROZENT,_______,_______,_______,_______, DE_AT        , DE_DHKOMMA , DE_COMM    , DE_DOT   , DE_PARAGRAPH  , _______,
+                                       _______  , _______      , _______  ,_______,_______,_______,_______, _______      , _______    , _______
     ),
 
     [_NUM] = LAYOUT(
