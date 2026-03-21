@@ -50,7 +50,7 @@ enum layers {
 #define DE_HASH KC_NUHS
 //#define DE_AT RALT(KC_Q) schon definiert
 #define DE_DHKOMMA LSFT(KC_2) //Doppelhochkomma
-#define DE_SHKOMMA KC_EQL
+#define DE_SHKOMMA LSFT(KC_NUHS)
 #define DE_PARAGRAPH LSFT(KC_3)
 #define DE_DRUCK KC_PSCR 
 
@@ -63,6 +63,17 @@ enum layers {
 
 #define ALT_L LALT_T(DE_L)
 #define NAV_ENTER LT(_NAV, KC_ENTER)
+
+#define AUSRUFEZ_GUI  LT(0, KC_F13)   
+#define MAL_ALT  LT(0, KC_F14)  
+#define FSLASH_SFT  LT(0, KC_F15)   
+#define EQUAL_CTL  LT(0, KC_F16)   
+#define HASH_CTL LT(0, KC_F17)   
+#define RKLAMMERL_SFT LT(0, KC_F18)
+#define RKLAMMERR_ALT LT(0, KC_F19)
+#define BSLASH_GUI LT(0, KC_F20)
+   
+
 
 bool caps_word_press_user(uint16_t keycode) {
     switch (keycode) {
@@ -148,7 +159,18 @@ enum {
     SOFT_GUI = SAFE_RANGE,
 };
 
-
+static bool process_sym_hrm(keyrecord_t *record, uint16_t tap_key, uint8_t mod_bit) {
+    if (record->tap.count && record->event.pressed) {
+        tap_code16(tap_key);
+    } else if (!record->tap.count) {
+        if (record->event.pressed) {
+            register_mods(mod_bit);
+        } else {
+            unregister_mods(mod_bit);
+        }
+    }
+    return false;
+}
 
 static bool soft_gui_active = false;
 static uint8_t soft_gui_L_count = 0;
@@ -210,6 +232,14 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     }
 
    switch (keycode){
+		case AUSRUFEZ_GUI:  return process_sym_hrm(record, DE_AUSRUFEZ, MOD_BIT(KC_LGUI));
+		case MAL_ALT:  return process_sym_hrm(record, DE_MAL,      MOD_BIT(KC_LALT));
+		case FSLASH_SFT:  return process_sym_hrm(record, DE_FSLASH,   MOD_BIT(KC_LSFT));
+		case EQUAL_CTL:  return process_sym_hrm(record, DE_EQUAL,    MOD_BIT(KC_LCTL));
+		case HASH_CTL: return process_sym_hrm(record, DE_HASH,     MOD_BIT(KC_RCTL));
+		case RKLAMMERL_SFT: return process_sym_hrm(record, DE_RKLAMMERL,MOD_BIT(KC_RSFT));
+		case RKLAMMERR_ALT: return process_sym_hrm(record, DE_RKLAMMERR,MOD_BIT(KC_LALT));
+		case BSLASH_GUI: return process_sym_hrm(record, DE_BSLASH,   MOD_BIT(KC_RGUI));
 		case LT(_MOUSE,KC_BSPC):
 		case LT(_NUM,KC_BSPC):
 			if(record->event.pressed && record->tap.count >0){
@@ -288,11 +318,11 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     ),
 	
 	[_SYM] = LAYOUT(  
-      _______,_______    , _______  , _______    , _______     , _______  ,                                 _______      , _______    , _______    , _______  , _______       , _______,
-      _______,DE_SHKOMMA ,DE_KLEINER,DE_GROESSER ,DE_MINUS     ,DE_ODER   ,                                 DE_CIRCUMFLEX,DE_GKLAMMERL,DE_GKLAMMERR, DE_DOLLAR, DE_EURO       , _______,
-      _______,DE_AUSRUFEZ,DE_MAL    ,DE_FSLASH   ,DE_EQUAL     ,DE_UND    ,                                 DE_HASH      ,DE_RKLAMMERL,DE_RKLAMMERR,DE_BSLASH ,DE_CIRCLE      , _______,
-      _______,DE_TILDE   ,DE_PLUS   ,DE_EKLAMMERL,DE_EKLAMMERR ,DE_PROZENT,_______,_______,_______,_______, DE_AT        , DE_DHKOMMA , DE_COMM    , DE_DOT   , DE_PARAGRAPH  , _______,
-                                       _______  , _______      , _______  ,_______,_______,_______,_______, _______      , _______    , _______
+      _______,_______     , _______  , _______    , _______     , _______  ,                                 _______      , _______     , _______     , _______  , _______     , _______,
+      _______,DE_SHKOMMA  ,DE_KLEINER,DE_GROESSER ,DE_MINUS     ,DE_ODER   ,                                 DE_CIRCUMFLEX,DE_GKLAMMERL ,DE_GKLAMMERR , DE_DOLLAR, DE_EURO     , _______,
+      _______,AUSRUFEZ_GUI,MAL_ALT   ,FSLASH_SFT  ,EQUAL_CTL    ,DE_UND    ,                                 HASH_CTL     ,RKLAMMERL_SFT,RKLAMMERR_ALT,BSLASH_GUI,DE_CIRCLE    , _______,
+      _______,DE_TILDE    ,DE_PLUS   ,DE_EKLAMMERL,DE_EKLAMMERR ,DE_PROZENT,_______,_______,_______,_______, DE_AT        , DE_DHKOMMA  , DE_COMM     , DE_DOT   , DE_PARAGRAPH, _______,
+                                         _______  , _______     , _______  ,_______,_______,_______,_______, _______      , _______     , _______
     ),
 
     [_NUM] = LAYOUT(
