@@ -27,10 +27,6 @@ bool my_leader_add_user(uint16_t keycode) {
         // Show Error Description
         SEND_STRING(SS_LSFT(SS_TAP(X_F2)));
 		return true;
-    } else if (leader_sequence_two_keys(KC_I, KC_T)) {
-        // Expression Type Info
-        SEND_STRING(SS_LCTL(SS_LSFT(SS_TAP(X_P))));
-		return true;
     } else if (leader_sequence_two_keys(KC_I, KC_P)) {
         // Parameter Info
         SEND_STRING(SS_LCTL(SS_TAP(X_P)));
@@ -47,7 +43,12 @@ bool my_leader_add_user(uint16_t keycode) {
         // Show Usages
         SEND_STRING(SS_LALT(SS_TAP(X_F7)));
 		return true;
-    } else if (leader_sequence_two_keys(KC_I, KC_H)) {
+    }
+    else if (leader_sequence_two_keys(KC_I, KC_T)) {
+        // Show External Usages
+        SEND_STRING(SS_LALT(SS_TAP(X_F8)));
+		return true;
+    }	else if (leader_sequence_two_keys(KC_I, KC_H)) {
         // Call Hierarchy
         SEND_STRING(SS_LCTL(SS_LALT(SS_TAP(X_H))));
 		return true;
