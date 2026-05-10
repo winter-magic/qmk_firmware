@@ -20,6 +20,28 @@ enum layers {
 	_FUNR
 };
 
+#define LAYOUT_ELORA_FORMAT( \
+    L00, L01, L02, L03, L04, L05, \
+    L10, L11, L12, L13, L14, L15, \
+    L20, L21, L22, L23, L24, L25, \
+    L30, L31, L32, L33, L34, L35, \
+    ML0, ML1, \
+    LT0, LT1, LT2, LT3, LT4, \
+    \
+    R00, R01, R02, R03, R04, R05, \
+    R10, R11, R12, R13, R14, R15, \
+    R20, R21, R22, R23, R24, R25, \
+    R30, R31, R32, R33, R34, R35, \
+    MR0, MR1, \
+    RT0, RT1, RT2, RT3, RT4 \
+) LAYOUT( \
+    L00, L01, L02, L03, L04, L05,                     R00, R01, R02, R03, R04, R05, \
+    L10, L11, L12, L13, L14, L15,                     R10, R11, R12, R13, R14, R15, \
+    L20, L21, L22, L23, L24, L25,                     R20, R21, R22, R23, R24, R25, \
+    L30, L31, L32, L33, L34, L35, ML0, ML1, MR0, MR1, R30, R31, R32, R33, R34, R35, \
+                   LT0, LT1, LT2, LT3, LT4, RT0, RT1, RT2, RT3, RT4 \
+)
+
 
 #define DE_UE KC_LBRC 
 #define DE_AE KC_QUOT 
@@ -238,7 +260,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 		case RKLAMMERR_ALT: return process_sym_hrm(record, DE_RKLAMMERR,MOD_BIT(KC_LALT));
 		case BSLASH_GUI: return process_sym_hrm(record, DE_BSLASH,   MOD_BIT(KC_RGUI));
 		case LT(_MOUSE,KC_BSPC):
-		case LT(_SYM,KC_BSPC):
+		//case LT(_SYM,KC_BSPC):
 			if(record->event.pressed && record->tap.count >0){
 				uint8_t mods = get_mods();
 				uint8_t weak_mods = get_weak_mods();
@@ -290,39 +312,125 @@ bool leader_add_user(uint16_t keycode) {
 // clang-format off
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
-    [_BASE] = LAYOUT(
+/*     [_BASE] = LAYOUT(
      KC_ESC ,KC_1             , KC_2       ,KC_3        , KC_4             ,  KC_5   ,                                                KC_6    ,   KC_7     ,KC_8        ,  KC_9,KC_0         , DE_SS ,
      KC_TAB ,DE_Q             ,DE_W        ,DE_E        , DE_R             ,  DE_T   ,                                                DE_Z    ,   DE_U     ,DE_I        ,DE_O  ,DE_P         , DE_UE ,
      _______,MT(SOFT_GUI,DE_A),LALT_T(DE_S),LSFT_T(DE_D),LCTL_T(DE_F)      ,  DE_G   ,                                                DE_H    ,RCTL_T(DE_J),RSFT_T(DE_K),ALT_L ,RGUI_T(DE_OE), DE_AE ,
      KC_LSFT,DE_Y             , DE_X       ,DE_C        , DE_V             ,  DE_B   , KC_DEL  ,DE_DRUCK ,KC_INSERT, _______         ,DE_N    ,DE_M        ,DE_COMM     ,DE_DOT,DE_MINS      ,KC_RSFT,
                                             RM_TOGG     ,LT(_MOUSE,KC_BSPC),NAV_ENTER,MO(_NUMR),QK_LEAD  ,KC_TAB   ,LT(_SYM, KC_BSPC),KC_SPACE,MO(_FUNR)   ,RM_TOGG
+    ), */
+	
+	[_BASE] = LAYOUT_ELORA_FORMAT(
+    KC_ESC ,KC_1             , KC_2       ,KC_3        , KC_4             ,  KC_5   ,                                                
+    KC_TAB ,DE_Q             ,DE_W        ,DE_E        , DE_R             ,  DE_T   ,                                                
+    _______,MT(SOFT_GUI,DE_A),LALT_T(DE_S),LSFT_T(DE_D),LCTL_T(DE_F)      ,  DE_G   ,                                               
+    KC_LSFT,DE_Y             , DE_X       ,DE_C        , DE_V             ,  DE_B   , 
+	 
+	                                           KC_DEL  ,DE_DRUCK ,
+    RM_TOGG     ,LT(_MOUSE,KC_BSPC),NAV_ENTER,MO(_NUMR),QK_LEAD  ,
+											
+	KC_6     ,   KC_7     ,KC_8        ,  KC_9,KC_0         , DE_SS ,
+	DE_Z     ,   DE_U     ,DE_I        ,DE_O  ,DE_P         , DE_UE ,										
+	DE_H     ,RCTL_T(DE_J),RSFT_T(DE_K),ALT_L ,RGUI_T(DE_OE), DE_AE ,
+    DE_N     ,DE_M        ,DE_COMM     ,DE_DOT,DE_MINS      ,KC_RSFT,	 
+	 
+	KC_INSERT, _______         ,
+	KC_TAB   ,LT(_SYM, KC_BSPC),KC_SPACE,MO(_FUNR)   ,RM_TOGG									
     ),
 
-    [_NAV] = LAYOUT(
-      _______, _______, _______  , _______  , _______ , _______,                                       _______ , _______  , _______ , _______, _______, _______,
-      _______, _______,_______   ,_______   ,_______  , _______,                                       KC_PGUP , KC_HOME  , KC_UP   , KC_END , _______, _______,
-      _______, KC_LGUI, KC_LALT  , KC_LSFT  , KC_LCTL , _______,                                       KC_PGDN , KC_LEFT  , KC_DOWN , KC_RGHT, _______, _______,
-      _______, _______, _______  ,_______   ,_______  , _______, _______,LAYERLOCK, LAYERLOCK,_______ ,_______ ,LCTL(DE_W), KC_BSPC , _______, _______, _______,
-                                   _______  , _______ , _______, _______, _______ , _______  ,_______ ,_______ , _______  , _______
+    [_NAV] = LAYOUT_ELORA_FORMAT(
+    _______, _______, _______  , _______  , _______ , _______,                                       
+    _______, _______,_______   ,_______   ,_______  , _______,                                      
+    _______, KC_LGUI, KC_LALT  , KC_LSFT  , KC_LCTL , _______,                                       
+    _______, _______, _______  ,_______   ,_______  , _______,
+
+								  _______,LAYERLOCK, 
+    _______  , _______ , _______, _______, _______ , 
+								   
+	_______ , _______  , _______ , _______, _______, _______,							   
+	KC_PGUP , KC_HOME  , KC_UP   , KC_END , _______, _______,							   
+	KC_PGDN , KC_LEFT  , KC_DOWN , KC_RGHT, _______, _______,
+	_______ ,LCTL(DE_W), KC_BSPC , _______, _______, _______,
+	
+	LAYERLOCK,_______ ,
+	_______  ,_______ ,_______ , _______  , _______							   
     ),
 	
-	[_MOUSE] = LAYOUT(
-      _______, _______, _______, _______, _______, _______,                                       _______, MS_ACL0  , MS_ACL1  , MS_ACL2  , _______, _______,
-      _______, _______, _______, RM_NEXT, DT_UP  , _______,                                       MS_WHLU, MS_BTN1  , MS_UP    , MS_BTN2  , _______, _______,
-      _______, KC_LGUI, KC_LALT, KC_LSFT, KC_LCTL, DT_PRNT,                                       MS_WHLD, MS_LEFT  , MS_DOWN  , MS_RGHT  , MS_BTN3, _______,
-      _______, _______, _______, RM_PREV, DT_DOWN, _______, _______,LAYERLOCK,LAYERLOCK, _______,_______ ,LCTL(DE_V),LCTL(DE_C),LCTL(DE_X), _______, _______,
-                                 _______, _______, _______, _______, _______ , _______ , _______, _______, _______  , _______
+	[_MOUSE] = LAYOUT_ELORA_FORMAT(
+    _______, _______, _______, _______, _______, _______,                                       
+    _______, _______, _______, RM_NEXT, DT_UP  , _______,                                       
+    _______, KC_LGUI, KC_LALT, KC_LSFT, KC_LCTL, DT_PRNT,                                       
+    _______, _______, _______, RM_PREV, DT_DOWN, _______, 
+	
+							   _______,LAYERLOCK,
+    _______, _______, _______, _______, _______ , 
+								 
+	_______ , MS_ACL0  , MS_ACL1  , MS_ACL2  , _______, _______,		
+    MS_WHLU , MS_BTN1  , MS_UP    , MS_BTN2  , _______, _______,	
+	MS_WHLD , MS_LEFT  , MS_DOWN  , MS_RGHT  , MS_BTN3, _______,
+	_______ ,LCTL(DE_V),LCTL(DE_C),LCTL(DE_X), _______, _______,
+	
+	LAYERLOCK, _______,
+	_______  , _______, _______, _______  , _______
+	
     ),
 	
-	[_SYM] = LAYOUT(  
-      _______,_______     , _______  , _______    , _______     , _______  ,                                 _______      , _______     , _______     , _______  , _______     , _______,
-      _______,DE_SHKOMMA  ,DE_KLEINER,DE_GROESSER ,DE_MINUS     ,DE_ODER   ,                                 DE_CIRCUMFLEX,DE_GKLAMMERL ,DE_GKLAMMERR , DE_DOLLAR, DE_EURO     , _______,
-      _______,AUSRUFEZ_GUI,MAL_ALT   ,FSLASH_SFT  ,EQUAL_CTL    ,DE_UND    ,                                 HASH_CTL     ,RKLAMMERL_SFT,RKLAMMERR_ALT,BSLASH_GUI,DE_CIRCLE    , _______,
-      _______,DE_TILDE    ,DE_PLUS   ,DE_EKLAMMERL,DE_EKLAMMERR ,DE_PROZENT,_______,_______,_______,_______, DE_AT        , DE_DHKOMMA  , DE_COMM     , DE_DOT   , DE_PARAGRAPH, _______,
-                                         _______  , _______     , _______  ,_______,_______,_______,_______, _______      , _______     , _______
+	[_SYM] = LAYOUT_ELORA_FORMAT(  
+    _______,_______     , _______  , _______    , _______     , _______  ,                                 
+    _______,DE_SHKOMMA  ,DE_KLEINER,DE_GROESSER ,DE_MINUS     ,DE_ODER   ,                                 
+    _______,AUSRUFEZ_GUI,MAL_ALT   ,FSLASH_SFT  ,EQUAL_CTL    ,DE_UND    ,                                 
+    _______,DE_TILDE    ,DE_PLUS   ,DE_EKLAMMERL,DE_EKLAMMERR ,DE_PROZENT,
+	
+									   _______,_______, 
+    _______  , _______     , _______  ,_______,_______,
+										 
+	_______      , _______     , _______     , _______  , _______     , _______,	
+    DE_CIRCUMFLEX,DE_GKLAMMERL ,DE_GKLAMMERR , DE_DOLLAR, DE_EURO     , _______,	 
+	HASH_CTL     ,RKLAMMERL_SFT,RKLAMMERR_ALT,BSLASH_GUI,DE_CIRCLE    , _______,
+	DE_AT        , DE_DHKOMMA  , DE_COMM     , DE_DOT   , DE_PARAGRAPH, _______,
+	 
+	_______,_______,
+	_______,_______, _______      , _______     , _______ 
+    ),
+	
+	[_NUMR] = LAYOUT_ELORA_FORMAT(
+    _______, _______  , _______, _______, _______ , _______ ,                                       
+    _______, DE_FSLASH, DE_MAL ,DE_MINUS, DE_PLUS , _______ ,                                       
+    _______, KC_LGUI  , KC_LALT, KC_LSFT, KC_LCTL ,MO(_FUNR),                                      
+    _______, _______  , _______, _______, _______ , _______ ,
+
+								 _______,LAYERLOCK,
+    _______, _______ , _______ , _______, _______ ,
+								   
+	_______, _______, _______, _______, _______ , _______,
+	_______, DE_7   , DE_8   , DE_9   , _______ , _______,
+	DE_0   , DE_1   , DE_2   , DE_3   , _______ , _______,
+	_______, DE_4   , DE_5   , DE_6   , _______ , _______,
+	
+	LAYERLOCK, _______,
+	 _______ , _______, _______, _______, _______
+    ),
+	
+	[_FUNR] = LAYOUT_ELORA_FORMAT(
+    _______, _______, _______, _______, _______, _______,                                       
+    _______, _______, _______, _______, _______, _______,                                       
+    _______, KC_LGUI, KC_LALT, KC_LSFT, KC_LCTL, _______,                                       
+    _______, _______, _______, _______, _______, _______, 
+	  
+							   _______,LAYERLOCK,
+    _______, _______, _______, _______, _______ , 
+								 
+	_______, _______, _______, _______, _______ , _______,
+	KC_F12 , KC_F7  , KC_F8  , KC_F9  , _______ , _______,
+	KC_F11 , KC_F1  , KC_F2  , KC_F3  , _______ , _______,
+	KC_F10 , KC_F4  , KC_F5  , KC_F6  , _______ , _______,
+	
+	LAYERLOCK, _______, 
+	_______  , _______, _______, _______, _______
+	
     ),
 
-    [_NUM] = LAYOUT(
+    /* [_NUM] = LAYOUT(
       _______, _______, _______, _______, _______ ,_______ ,                                       _______, _______, _______, _______, _______ , _______,
       _______, _______, DE_7   , DE_8   , DE_9    ,_______ ,                                       _______, DE_PLUS,DE_MINUS, DE_MAL ,DE_FSLASH, _______,
       _______, DE_0   , DE_4   , DE_5   , DE_6    ,_______ ,                                       _______, KC_RCTL, KC_RSFT, KC_LALT, KC_RGUI , _______,
@@ -336,21 +444,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
       _______, _______, KC_F4  , KC_F5  , KC_F6  , KC_F11 ,                                       _______, KC_RCTL, KC_RSFT, KC_LALT, KC_RGUI , _______,
       _______, _______, KC_F1  , KC_F2  , KC_F3  , KC_F10 , _______,LAYERLOCK,LAYERLOCK, _______,_______ , _______, _______, _______, _______ , _______,
                                  _______, _______, _______, _______, _______ , _______ , _______, _______, _______, _______
-    ),
+    ), */
 
-    [_NUMR] = LAYOUT(
-      _______, _______  , _______, _______, _______ , _______ ,                                       _______, _______, _______, _______, _______ , _______,
-      _______, DE_FSLASH, DE_MAL ,DE_MINUS, DE_PLUS , _______ ,                                       _______, DE_7   , DE_8   , DE_9   , _______ , _______,
-      _______, KC_LGUI  , KC_LALT, KC_LSFT, KC_LCTL ,MO(_FUNR),                                       DE_0   , DE_1   , DE_2   , DE_3   , _______ , _______,
-      _______, _______  , _______, _______, _______ , _______ , _______,LAYERLOCK,LAYERLOCK, _______,_______ , DE_4   , DE_5   , DE_6   , _______ , _______,
-                                   _______, _______ , _______ , _______, _______ , _______ , _______, _______, _______, _______
-    ),
-	
-	[_FUNR] = LAYOUT(
-      _______, _______, _______, _______, _______, _______,                                       _______, _______, _______, _______, _______ , _______,
-      _______, _______, _______, _______, _______, _______,                                       KC_F12 , KC_F7  , KC_F8  , KC_F9  , _______ , _______,
-      _______, KC_LGUI, KC_LALT, KC_LSFT, KC_LCTL, _______,                                       KC_F11 , KC_F1  , KC_F2  , KC_F3  , _______ , _______,
-      _______, _______, _______, _______, _______, _______, _______,LAYERLOCK,LAYERLOCK, _______, KC_F10 , KC_F4  , KC_F5  , KC_F6  , _______ , _______,
-                                 _______, _______, _______, _______, _______ , _______ , _______, _______, _______, _______
-    ),
+
 };
